@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>sistema de reservas de salas</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+
+<body>
+    <div id="root"></div>
+
+    <!-- scripts de componentes -->
+    <script type="text/babel" src="js/utils.js"></script>
+    <script type="text/babel" src="js/components/Login.js"></script>
+    <script type="text/babel" src="js/components/Navegacion.js"></script>
+    <script type="text/babel" src="js/components/participantes/ListaParticipantes.js"></script>
+    <script type="text/babel" src="js/components/participantes/FormularioParticipante.js"></script>
+    <script type="text/babel" src="js/components/participantes/ModalEditarParticipante.js"></script>
+    <script type="text/babel" src="js/components/salas/ListaSalas.js"></script>
+    <script type="text/babel" src="js/components/salas/FormularioSala.js"></script>
+    <script type="text/babel" src="js/components/salas/ModalEditarSala.js"></script>
+    <script type="text/babel" src="js/components/sanciones/ListaSanciones.js"></script>
+    <script type="text/babel" src="js/components/sanciones/FormularioSancion.js"></script>
+    <script type="text/babel" src="js/components/sanciones/ModalEditarSancion.js"></script>
+    <script type="text/babel" src="js/components/reservas/FormularioReserva.js"></script>
+    <script type="text/babel" src="js/components/reportes/Reportes.js"></script>
+    <script type="text/babel" src="js/pages/ParticipantesPage.js"></script>
+    <script type="text/babel" src="js/pages/SalasPage.js"></script>
+    <script type="text/babel" src="js/pages/SancionesPage.js"></script>
+    <script type="text/babel" src="js/pages/ReservasPage.js"></script>
+    <script type="text/babel" src="js/pages/ReportesPage.js"></script>
+    <script type="text/babel" src="js/App.js"></script>
+
+    <script type="text/babel">
+        // Iniciar la aplicación React
+        const contenedor = ReactDOM.createRoot(document.getElementById('root'));
+        contenedor.render(<App />);
+    </script>
+</body>
+
+</html>

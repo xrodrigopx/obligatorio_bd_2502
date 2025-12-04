@@ -1,0 +1,18 @@
+{
+  "name": "reserva-salas-node",
+  "version": "1.0.0",
+  "description": "Backend en Node.js para sistema de reservas (usa MySQL)",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "import": "node import_sql.js",
+    "setpw": "node set_passwords.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "express": "^4.18.2",
+    "mysql2": "^3.2.0",
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5"
+  }
+}
