@@ -2,6 +2,9 @@ const App = () => {
   // estado de autenticacion
   const [autenticado, setAutenticado] = useState(false);
 
+  // estado del usuario con su rol
+  const [usuario, setUsuario] = useState(null);
+
   // estado principal de la app, por defecto empiezo en participantes
   const [paginaActual, setPaginaActual] = useState("participantes");
 
@@ -42,12 +45,18 @@ const App = () => {
   }, []);
 
   // funcion para manejar el login exitoso
-  const manejarLogin = () => {
+  const manejarLogin = (datosUsuario) => {
+    setUsuario(datosUsuario);
     setAutenticado(true);
+    // si es alumno, llevarlo directo a reservas
+    if (datosUsuario.rol === "alumno") {
+      setPaginaActual("reservas");
+    }
   };
 
   // funcion para cerrar sesion
   const manejarLogout = () => {
+    setUsuario(null);
     setAutenticado(false);
     setPaginaActual("participantes"); // volver a la pagina inicial
   };
@@ -59,6 +68,20 @@ const App = () => {
 
   // aca decido que pagina mostrar segun donde este el usuario
   const renderizarContenido = () => {
+    const esDocente = usuario?.rol === "docente";
+
+    // si es alumno y trata de acceder a una pagina restringida, redirigir a reservas
+    const paginasRestringidas = [
+      "participantes",
+      "salas",
+      "sanciones",
+      "reportes",
+    ];
+    if (!esDocente && paginasRestringidas.includes(paginaActual)) {
+      setPaginaActual("reservas");
+      return <ReservasPage />;
+    }
+
     switch (paginaActual) {
       case "participantes":
         return <ParticipantesPage />;
@@ -71,7 +94,7 @@ const App = () => {
       case "reportes":
         return <ReportesPage />;
       default:
-        return <ParticipantesPage />; // por defecto participantes
+        return esDocente ? <ParticipantesPage /> : <ReservasPage />;
     }
   };
 
@@ -129,6 +152,7 @@ const App = () => {
         onCambiarPagina={cambiarPagina}
         estadoConexion={estadoConexion}
         onLogout={manejarLogout}
+        usuario={usuario}
       />
 
       <main className="py-4">{renderizarContenido()}</main>

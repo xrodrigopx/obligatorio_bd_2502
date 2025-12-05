@@ -151,7 +151,15 @@ el sistema implementa autenticacion basada en base de datos con las siguientes c
    - muestra aplicacion completa si autenticado
    - muestra Login si no autenticado
 
-4. **cierre de sesion**
+4. **asignacion de roles**
+
+   - despues de validar credenciales, se consulta el rol del participante
+   - busca en tabla `participante_programa_academico`
+   - roles disponibles: `alumno` o `docente`
+   - si no tiene rol asignado, se asigna `alumno` por defecto
+   - el rol se incluye en el objeto usuario retornado
+
+5. **cierre de sesion**
    - boton "salir" en navbar ejecuta `onLogout()`
    - resetea estado: `setAutenticado(false)`
    - vuelve a mostrar pantalla de login
@@ -262,11 +270,21 @@ SELECT correo, contrasena FROM login WHERE correo = ?
 **obtener datos del participante**
 
 ```sql
-SELECT ci, nombre, apellido, email FROM participante WHERE email = ?
+SELECT p.ci, p.nombre, p.apellido, p.email FROM participante p WHERE p.email = ?
 ```
 
 - recupera informacion del usuario autenticado
 - se ejecuta despues de validar el login
+
+**obtener rol del participante**
+
+```sql
+SELECT rol FROM participante_programa_academico WHERE ci_participante = ? LIMIT 1
+```
+
+- obtiene el rol del participante (alumno/docente)
+- se ejecuta despues de obtener datos del participante
+- si no tiene rol asignado, se usa "alumno" por defecto
 
 ### participantes
 
@@ -623,6 +641,19 @@ SELECT nombre, apellido FROM participante WHERE ci=?
 
 - recupera nombre completo de un participante
 - usado en reportes individuales
+
+**obtener rol y programa academico**
+
+```sql
+SELECT pa.rol, pa.nombre_programa, p.tipo
+FROM participante_programa_academico pa
+JOIN programa_academico p ON pa.nombre_programa=p.nombre_programa
+WHERE pa.ci_participante=? LIMIT 1
+```
+
+- obtiene el rol (alumno/docente), nombre del programa y tipo (grado/posgrado)
+- usado para validaciones de acceso y permisos
+- ubicado en utils.js (linea 48)
 
 **nota de seguridad**: todas las consultas utilizan prepared statements con placeholders (?) para prevenir inyecciones sql. los parametros se pasan por separado nunca concatenados en el string sql.
 

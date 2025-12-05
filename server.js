@@ -92,17 +92,32 @@ app.post("/api/login", async (req, res) => {
       return res.status(401).json({ error: "credenciales incorrectas" });
     }
 
-    // obtener datos del participante
+    // obtener datos del participante y su rol
     const participante = await db.query(
-      "SELECT ci, nombre, apellido, email FROM participante WHERE email = ?",
+      "SELECT p.ci, p.nombre, p.apellido, p.email FROM participante p WHERE p.email = ?",
       [correo]
     );
+
+    if (participante.length === 0) {
+      return res.status(401).json({ error: "participante no encontrado" });
+    }
+
+    // obtener el rol del participante
+    const rolQuery = await db.query(
+      "SELECT rol FROM participante_programa_academico WHERE ci_participante = ? LIMIT 1",
+      [participante[0].ci]
+    );
+
+    const rol = rolQuery.length > 0 ? rolQuery[0].rol : "alumno";
 
     // login exitoso
     res.json({
       ok: true,
       mensaje: "login exitoso",
-      usuario: participante[0] || { email: correo },
+      usuario: {
+        ...participante[0],
+        rol: rol,
+      },
     });
   } catch (e) {
     console.error("error en login:", e);
