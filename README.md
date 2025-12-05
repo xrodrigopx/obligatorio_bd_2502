@@ -113,12 +113,107 @@ npm start
 
 Abrir: **http://localhost:3000**
 
-## Credenciales de Acceso
+## mecanismo de autenticacion
 
-Al abrir la aplicación, se mostrará una pantalla de login. Usar las siguientes credenciales:
+el sistema implementa autenticacion basada en base de datos con las siguientes caracteristicas:
 
-- **Usuario**: `user`
-- **Contraseña**: `user123`
+### arquitectura de seguridad
+
+**tablas involucradas:**
+
+- `participante` - almacena datos personales (ci, nombre, apellido, email)
+- `login` - almacena credenciales de acceso (correo, contrasena hasheada)
+
+**flujo de autenticacion:**
+
+1. **pantalla de login (Login.js)**
+
+   - el usuario ingresa correo electronico y contraseña
+   - validacion en frontend: verifica campos no vacios
+   - envia credenciales via POST a `/api/login`
+
+2. **endpoint de autenticacion (server.js)**
+
+   ```javascript
+   POST / api / login;
+   ```
+
+   - recibe `{ correo, password }` en el body
+   - busca usuario en tabla `login` usando prepared statement
+   - compara contraseña con bcrypt (`bcrypt.compareSync()`)
+   - si es valido, consulta datos del participante
+   - retorna `{ ok: true, mensaje, usuario }`
+
+3. **gestion de sesion (App.js)**
+
+   - componente App mantiene estado `autenticado` (true/false)
+   - al login exitoso: `setAutenticado(true)` y guarda datos usuario
+   - muestra aplicacion completa si autenticado
+   - muestra Login si no autenticado
+
+4. **cierre de sesion**
+   - boton "salir" en navbar ejecuta `onLogout()`
+   - resetea estado: `setAutenticado(false)`
+   - vuelve a mostrar pantalla de login
+
+### seguridad implementada
+
+**encriptacion de contraseñas:**
+
+- algoritmo: bcrypt con salt de 10 rounds
+- las contraseñas nunca se almacenan en texto plano
+- archivo: `utils.js` - funcion `hashPassword()`
+- verificacion: `bcrypt.compareSync(plainPassword, hashedPassword)`
+
+**proteccion contra inyeccion sql:**
+
+- todas las queries usan prepared statements con placeholders `?`
+- parametros se pasan separados del sql
+- ejemplo: `SELECT ... WHERE correo = ?` con `[correo]`
+
+**validaciones:**
+
+- campos requeridos verificados en frontend y backend
+- mensajes de error genericos ("credenciales incorrectas") para no revelar info
+- manejo de errores con try/catch en todas las operaciones
+
+### configuracion de usuarios
+
+**script de inicializacion (set_passwords.js):**
+
+```bash
+npm run setpw
+```
+
+este script:
+
+- lee todos los correos de la tabla `login`
+- genera contraseña: `[nombre_del_correo]123` (ej: ana.perez123)
+- caso especial admin: `admin-bd-ucu-2025`
+- hashea cada contraseña con bcrypt
+- actualiza tabla `login` con hash
+
+**estructura de datos:**
+
+```sql
+CREATE TABLE login (
+  correo VARCHAR(100) PRIMARY KEY,
+  contrasena VARCHAR(255) NOT NULL
+);
+```
+
+### Credenciales de Acceso
+
+credenciales disponibles despues de ejecutar `npm run setpw`:
+
+- **Admin**:
+
+  - correo: `admin@example.com`
+  - contraseña: `admin-bd-ucu-2025`
+
+- **Usuarios de prueba**:
+  - patron: `[correo]` / `[nombre]123`
+  - ejemplo: `ana.perez@example.com` / `ana.perez123`
 
 ## Cómo probar
 
